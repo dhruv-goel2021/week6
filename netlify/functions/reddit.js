@@ -9,31 +9,39 @@ let fetch = require('node-fetch')
 
 exports.handler = async function(event) {
   // Write the event Object to the back-end console
-  console.log(event)
+  //console.log(event)
 
   // Get the parameter for which subreddit
-
+let subreddit = event.queryStringParameters.subreddit
   // define the URL for Reddit posts data
-  // let url = `https://feed2json.org/convert?url=https%3A%2F%2Fwww.reddit.com%2Fr%2F${subreddit}%2F.rss`
+
+  let url = `https://feed2json.org/convert?url=https%3A%2F%2Fwww.reddit.com%2Fr%2F${subreddit}%2F.rss`
 
   // - Fetch the url, wait for a response, store the response in memory
-
+let response = await fetch(url)
   // - Ask for the json-formatted data from the response, wait for the data, store it in memory
-
+  let json = await response.json()
+  console.log(subreddit)
   // - Write the json-formatted data to the back-end console
-
+console.log(json)
   // Create a new Array to be returned by the API
+let subredditToReturn = []
 
   // Loop through the posts, for each one:
-
+  for (let i =0; i < json.items.length; i++) {
     // Store each post from the Reddit API in memory
-
+    let subredditPosts = json.items[i]
     // Create a new post object containing the pertinent fields
-
+//console.log(subredditPosts)
+let relevantSubredditPosts = {url:subredditPosts.url, 
+                              title:subredditPosts.title, 
+                              author:subredditPosts.author.name, 
+                              date:subredditPosts.date_published}
     // Add (push) the post object to the final Array
-
+    subredditToReturn.push(relevantSubredditPosts)
+  }
   return {
     statusCode: 200,
-    body: `Hello from the back-end!` // this must be a String
+    body: JSON.stringify(subredditToReturn) // this must be a String
   }
 }
